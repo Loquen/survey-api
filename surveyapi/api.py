@@ -27,8 +27,19 @@ def surveys():
     db.session.commit()
     return survey.to_dict(), 201
 
-@api.route('/surveys/<int:id>/')
+@api.route('/surveys/<int:id>/', methods=('GET', 'PUT'))
 def survey(id):
-  survey = Survey.query.get(id)
-  return { 'survey': survey.to_dict() }
+  if request.method == 'GET':
+    survey = Survey.query.get(id)
+    return { 'survey': survey.to_dict() }
+  elif request.method == 'PUT':
+    data = request.get_json()
+    for q in data['questions']:
+      choice = Choice.query.get(q['choice'])
+      choice.selected = choice.selected + 1
+    db.session.commit()
+    survey = Survey.query.get(data['id'])
+    return survey.to_dict(), 201
+
+
 
