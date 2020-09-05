@@ -4,11 +4,17 @@ api.py
   REST requests and responses
 """
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, request
+from .models import db, Survey, Question, Choice
 
 api = Blueprint('api', __name__)
 
-@api.route('/hello/<string:name>/')
-def say_hello(name):
-  response = { ' msg': "Hello {}".format(name) }
-  return jsonify(response)
+@api.route('/surveys/')
+def surveys():
+  surveys = Survey.query.all()
+  return { 'surveys': [s.to_dict() for s in surveys] }
+
+@api.route('/surveys/<int:id>/')
+def survey(id):
+  survey = Survey.query.get(id)
+  return { 'survey': survey.to_dict() }
